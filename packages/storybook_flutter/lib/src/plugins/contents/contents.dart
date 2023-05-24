@@ -80,10 +80,13 @@ class _ContentsState extends State<_Contents> {
           dividerColor: Colors.transparent,
         ),
         child: ExpansionTile(
+          leading: const Icon(
+            Icons.label_important_outline,
+          ),
           title: Text(
             title,
             style: const TextStyle(
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
             ),
           ),
           initiallyExpanded: context
@@ -105,8 +108,19 @@ class _ContentsState extends State<_Contents> {
 
     return ListTile(
       selected: story == context.watch<StoryNotifier>().currentStory,
-      title: Text(story.title),
-      subtitle: description == null ? null : Text(description),
+      title: Text(story.title,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          )),
+      subtitle: description == null
+          ? null
+          : Text(
+              description,
+              style: const TextStyle(
+                fontSize: 10,
+              ),
+            ),
       onTap: () {
         context.read<StoryNotifier>().currentStoryName = story.name;
         context.read<OverlayController?>()?.remove();
