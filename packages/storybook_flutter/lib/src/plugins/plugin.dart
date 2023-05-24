@@ -4,6 +4,7 @@ import 'package:storybook_flutter/src/plugins/device_frame.dart';
 import 'package:storybook_flutter/src/plugins/directionality.dart';
 import 'package:storybook_flutter/src/plugins/knobs.dart';
 import 'package:storybook_flutter/src/plugins/theme_mode.dart';
+import 'package:storybook_flutter/src/plugins/theme_panel_mode.dart';
 import 'package:storybook_flutter/src/plugins/time_dilation.dart';
 
 export 'contents/contents.dart';
@@ -22,6 +23,7 @@ List<Plugin> initializePlugins({
   DeviceFrameData initialDeviceFrameData = const DeviceFrameData(),
   bool contentsSidePanel = false,
   bool knobsSidePanel = false,
+  bool enablePanelTheme = true,
 }) =>
     [
       if (enableContents) ContentsPlugin(sidePanel: contentsSidePanel),
@@ -31,6 +33,7 @@ List<Plugin> initializePlugins({
         DeviceFramePlugin(initialData: initialDeviceFrameData),
       if (enableTimeDilation) TimeDilationPlugin(),
       if (enableDirectionality) DirectionalityPlugin(),
+      if (enablePanelTheme) ThemePanelModePlugin(),
     ];
 
 typedef OnPluginButtonPressed = void Function(BuildContext);

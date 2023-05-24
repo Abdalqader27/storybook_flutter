@@ -17,6 +17,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Storybook(
+        wrapperBuilder: (context, child) => materialWrapper(
+          context,
+          child,
+          theme: ThemeData.light(useMaterial3: true),
+          darkTheme: ThemeData.dark(useMaterial3: true),
+        ),
+        brandingWidget: const FlutterLogo(),
         initialStory: 'Screens/Scaffold',
         plugins: _plugins,
         stories: [

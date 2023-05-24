@@ -1,3 +1,4 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,11 +9,16 @@ import 'package:storybook_flutter/src/plugins/plugin_panel.dart';
 import 'package:storybook_flutter/src/story.dart';
 
 /// Use this wrapper to wrap each story into a [MaterialApp] widget.
-Widget materialWrapper(BuildContext context, Widget? child) => MaterialApp(
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+Widget materialWrapper(
+  BuildContext context,
+  Widget? child, {
+  ThemeData? theme,
+  ThemeData? darkTheme,
+}) =>
+    MaterialApp(
+      theme: theme ?? ThemeData.light(),
+      darkTheme: darkTheme ?? ThemeData.dark(),
       debugShowCheckedModeBanner: false,
-      useInheritedMediaQuery: true,
       home: Directionality(
         textDirection: Directionality.of(context),
         child: Scaffold(
@@ -26,7 +32,6 @@ Widget materialWrapper(BuildContext context, Widget? child) => MaterialApp(
 /// Use this wrapper to wrap each story into a [CupertinoApp] widget.
 Widget cupertinoWrapper(BuildContext context, Widget? child) => CupertinoApp(
       debugShowCheckedModeBanner: false,
-      useInheritedMediaQuery: true,
       home: Directionality(
         textDirection: Directionality.of(context),
         child: CupertinoPageScaffold(
@@ -46,6 +51,8 @@ class Storybook extends StatefulWidget {
     this.wrapperBuilder = materialWrapper,
     this.showPanel = true,
     this.brandingWidget,
+    this.theme,
+    this.darkTheme,
   })  : plugins = UnmodifiableListView(plugins ?? _defaultPlugins),
         stories = UnmodifiableListView(stories),
         super(key: key);
@@ -64,6 +71,12 @@ class Storybook extends StatefulWidget {
 
   /// Whether to show the plugin panel at the bottom.
   final bool showPanel;
+
+  /// Theme to use in the plugin panel.
+  final ThemeData? theme;
+
+  /// Dark theme to use in the plugin panel.
+  final ThemeData? darkTheme;
 
   /// Branding widget to use in the plugin panel.
   final Widget? brandingWidget;
@@ -106,72 +119,84 @@ class _StorybookState extends State<Storybook> {
       wrapperBuilder: widget.wrapperBuilder,
     );
 
-    return GestureDetector(
-      onTap: () {
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
-      child: MediaQuery.fromWindow(
-        child: Nested(
-          children: [
-            Provider.value(value: widget.plugins),
-            ChangeNotifierProvider.value(value: _storyNotifier),
-            ...widget.plugins
-                .map((p) => p.wrapperBuilder)
-                .whereType<TransitionBuilder>()
-                .map((builder) => SingleChildBuilder(builder: builder))
-          ],
-          child: widget.showPanel
-              ? Stack(
-                  alignment: Alignment.topCenter,
-                  children: [
-                    Column(
+    return AdaptiveTheme(
+      light: widget.theme ?? ThemeData.light(useMaterial3: true),
+      dark: widget.darkTheme ?? ThemeData.dark(useMaterial3: true),
+      initial: AdaptiveThemeMode.light,
+      builder: (theme, darkTheme) => MaterialApp(
+        theme: theme,
+        darkTheme: darkTheme,
+        home: GestureDetector(
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          child: MediaQuery.fromView(
+            view: View.of(context),
+            child: Nested(
+              children: [
+                Provider.value(value: widget.plugins),
+                ChangeNotifierProvider.value(value: _storyNotifier),
+                ...widget.plugins
+                    .map((p) => p.wrapperBuilder)
+                    .whereType<TransitionBuilder>()
+                    .map((builder) => SingleChildBuilder(builder: builder))
+              ],
+              child: widget.showPanel
+                  ? Stack(
+                      alignment: Alignment.topCenter,
                       children: [
-                        Expanded(child: currentStory),
-                        RepaintBoundary(
-                          child: Material(
-                            child: SafeArea(
-                              top: false,
-                              child: CompositedTransformTarget(
-                                link: _layerLink,
-                                child: Directionality(
-                                  textDirection: TextDirection.ltr,
-                                  child: Container(
-                                    width: double.infinity,
-                                    decoration: const BoxDecoration(
-                                      border: Border(
-                                        top: BorderSide(color: Colors.black12),
-                                      ),
-                                    ),
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: PluginPanel(
-                                            plugins: widget.plugins,
-                                            overlayKey: _overlayKey,
-                                            layerLink: _layerLink,
+                        Column(
+                          children: [
+                            Expanded(child: currentStory),
+                            RepaintBoundary(
+                              child: Material(
+                                child: SafeArea(
+                                  top: false,
+                                  child: CompositedTransformTarget(
+                                    link: _layerLink,
+                                    child: Directionality(
+                                      textDirection: TextDirection.ltr,
+                                      child: Container(
+                                        width: double.infinity,
+                                        decoration: const BoxDecoration(
+                                          border: Border(
+                                            top: BorderSide(
+                                              color: Colors.black12,
+                                            ),
                                           ),
                                         ),
-                                        widget.brandingWidget ??
-                                            const SizedBox.shrink(),
-                                      ],
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: PluginPanel(
+                                                plugins: widget.plugins,
+                                                overlayKey: _overlayKey,
+                                                layerLink: _layerLink,
+                                              ),
+                                            ),
+                                            widget.brandingWidget ??
+                                                const SizedBox.shrink(),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
+                          ],
+                        ),
+                        Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: Overlay(key: _overlayKey),
                         ),
                       ],
-                    ),
-                    Directionality(
-                      textDirection: TextDirection.ltr,
-                      child: Overlay(key: _overlayKey),
-                    ),
-                  ],
-                )
-              : currentStory,
+                    )
+                  : currentStory,
+            ),
+          ),
         ),
       ),
     );
