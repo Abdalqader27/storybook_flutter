@@ -123,104 +123,91 @@ class _StorybookState extends State<Storybook> {
       wrapperBuilder: widget.wrapperBuilder,
     );
 
-    return FutureBuilder(
-      future: _waitForSplash(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: widget.splashWidget ?? const FlutterLogo(size: 100),
-          );
-        }
-
-        return AdaptiveTheme(
-          light: widget.theme ?? ThemeData.light(useMaterial3: true),
-          dark: widget.darkTheme ?? ThemeData.dark(useMaterial3: true),
-          initial: AdaptiveThemeMode.light,
-          builder: (theme, darkTheme) => MaterialApp(
-            theme: theme,
-            darkTheme: darkTheme,
-            home: GestureDetector(
-              onTap: () {
-                FocusManager.instance.primaryFocus?.unfocus();
-              },
-              child: MediaQuery.fromView(
-                view: View.of(context),
-                child: Nested(
-                  children: [
-                    Provider.value(value: widget.plugins),
-                    ChangeNotifierProvider.value(value: _storyNotifier),
-                    ...widget.plugins
-                        .map((p) => p.wrapperBuilder)
-                        .whereType<TransitionBuilder>()
-                        .map((builder) => SingleChildBuilder(builder: builder))
-                  ],
-                  child: widget.showPanel
-                      ? Stack(
-                          alignment: Alignment.topCenter,
-                          children: [
-                            Column(
-                              children: [
-                                Expanded(child: currentStory),
-                                RepaintBoundary(
-                                  child: Material(
-                                    child: SafeArea(
-                                      top: false,
-                                      child: CompositedTransformTarget(
-                                        link: _layerLink,
-                                        child: Directionality(
-                                          textDirection: TextDirection.ltr,
-                                          child: Container(
-                                            width: double.infinity,
-                                            decoration: const BoxDecoration(
-                                              border: Border(
-                                                top: BorderSide(
-                                                  color: Colors.black12,
-                                                ),
-                                              ),
-                                            ),
-                                            child: Stack(
-                                              alignment: Alignment.center,
-                                              children: [
-                                                Align(
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  child: PluginPanel(
-                                                    plugins: widget.plugins,
-                                                    overlayKey: _overlayKey,
-                                                    layerLink: _layerLink,
-                                                  ),
-                                                ),
-                                                widget.brandingWidget ??
-                                                    const SizedBox.shrink(),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+    return AdaptiveTheme(
+      light: widget.theme ?? ThemeData.light(useMaterial3: true),
+      dark: widget.darkTheme ?? ThemeData.dark(useMaterial3: true),
+      initial: AdaptiveThemeMode.light,
+      builder: (theme, darkTheme) => MaterialApp(
+        theme: theme,
+        darkTheme: darkTheme,
+        home: GestureDetector(
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          child: MediaQuery.fromView(
+            view: View.of(context),
+            child: Nested(
+              children: [
+                Provider.value(value: widget.plugins),
+                ChangeNotifierProvider.value(value: _storyNotifier),
+                ...widget.plugins
+                    .map((p) => p.wrapperBuilder)
+                    .whereType<TransitionBuilder>()
+                    .map((builder) => SingleChildBuilder(builder: builder))
+              ],
+              child: widget.showPanel
+                  ? Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  Column(
+                    children: [
+                      Expanded(child: currentStory),
+                      RepaintBoundary(
+                        child: Material(
+                          child: SafeArea(
+                            top: false,
+                            child: CompositedTransformTarget(
+                              link: _layerLink,
+                              child: Directionality(
+                                textDirection: TextDirection.ltr,
+                                child: Container(
+                                  width: double.infinity,
+                                  decoration: const BoxDecoration(
+                                    border: Border(
+                                      top: BorderSide(
+                                        color: Colors.black12,
                                       ),
                                     ),
                                   ),
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Align(
+                                        alignment:
+                                        Alignment.centerLeft,
+                                        child: PluginPanel(
+                                          plugins: widget.plugins,
+                                          overlayKey: _overlayKey,
+                                          layerLink: _layerLink,
+                                        ),
+                                      ),
+                                      widget.brandingWidget ??
+                                          const SizedBox.shrink(),
+                                    ],
+                                  ),
                                 ),
-                              ],
+                              ),
                             ),
-                            Directionality(
-                              textDirection: TextDirection.ltr,
-                              child: Overlay(key: _overlayKey),
-                            ),
-                          ],
-                        )
-                      : currentStory,
-                ),
-              ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: Overlay(key: _overlayKey),
+                  ),
+                ],
+              )
+                  : currentStory,
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
+
   }
 
-  Future<void> _waitForSplash() async {
-    await Future<void>.delayed(const Duration(seconds: 2));
-  }
 }
 
 class CurrentStory extends StatelessWidget {

@@ -106,6 +106,14 @@ class MyApp extends StatelessWidget {
             ),
           ),
           Story(
+            name: 'Screens/Counter',
+            description: 'Demo Counter app with about dialog.',
+            builder: (context) => CounterPage(
+              title: context.knobs.text(label: 'Title', initial: 'Counter'),
+              enabled: context.knobs.boolean(label: 'Enabled', initial: true),
+            ),
+          ),
+          Story(
             name: 'Widgets/Text',
             description: 'Simple text widget.',
             builder: (context) => const Center(child: Text('Simple text')),
