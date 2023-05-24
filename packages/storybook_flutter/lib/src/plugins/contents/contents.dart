@@ -69,17 +69,36 @@ class _ContentsState extends State<_Contents> {
     required Iterable<Story> stories,
     required List<Widget> children,
     EdgeInsetsGeometry? childrenPadding,
-  }) =>
-      ExpansionTile(
-        title: Text(title),
-        initiallyExpanded:
-            context.watch<StoryNotifier>().searchTerm.isNotEmpty ||
-                stories
-                    .map((s) => s.name)
-                    .contains(context.watch<StoryNotifier>().currentStoryName),
-        childrenPadding: childrenPadding,
-        children: children,
-      );
+  }) {
+    final theme = Theme.of(context);
+
+    return Card(
+      shadowColor: Colors.transparent,
+      clipBehavior: Clip.antiAlias,
+      child: Theme(
+        data: theme.copyWith(
+          dividerColor: Colors.transparent,
+        ),
+        child: ExpansionTile(
+          title: Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          initiallyExpanded: context
+                  .watch<StoryNotifier>()
+                  .searchTerm
+                  .isNotEmpty ||
+              stories
+                  .map((s) => s.name)
+                  .contains(context.watch<StoryNotifier>().currentStoryName),
+          childrenPadding: childrenPadding,
+          children: children,
+        ),
+      ),
+    );
+  }
 
   Widget _buildStoryTile(Story story) {
     final description = story.description;
