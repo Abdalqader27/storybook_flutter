@@ -82,6 +82,7 @@ class _ContentsState extends State<_Contents> {
         child: ExpansionTile(
           leading: const Icon(
             Icons.label_important_outline,
+            size: 18,
           ),
           title: Text(
             title,
@@ -108,11 +109,16 @@ class _ContentsState extends State<_Contents> {
 
     return ListTile(
       selected: story == context.watch<StoryNotifier>().currentStory,
-      title: Text(story.title,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          )),
+      dense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
+      title: Text(
+        story.title,
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
       subtitle: description == null
           ? null
           : Text(
