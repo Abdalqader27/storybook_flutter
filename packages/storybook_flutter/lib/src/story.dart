@@ -8,6 +8,7 @@ class Story {
     this.description,
     required this.builder,
     this.wrapperBuilder,
+    this.docBuilder,
   });
 
   /// Unique name of the story.
@@ -25,6 +26,8 @@ class Story {
 
   /// Story builder.
   final WidgetBuilder builder;
+
+  final WidgetBuilder? docBuilder;
 
   List<String> get path => name.split(_sectionSeparator);
 

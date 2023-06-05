@@ -147,67 +147,65 @@ class _StorybookState extends State<Storybook> {
               ],
               child: widget.showPanel
                   ? Stack(
-                alignment: Alignment.topCenter,
-                children: [
-                  Column(
-                    children: [
-                      Expanded(child: currentStory),
-                      RepaintBoundary(
-                        child: Material(
-                          child: SafeArea(
-                            top: false,
-                            child: CompositedTransformTarget(
-                              link: _layerLink,
-                              child: Directionality(
-                                textDirection: TextDirection.ltr,
-                                child: Container(
-                                  width: double.infinity,
-                                  decoration: const BoxDecoration(
-                                    border: Border(
-                                      top: BorderSide(
-                                        color: Colors.black12,
-                                      ),
-                                    ),
-                                  ),
-                                  child: Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      Align(
-                                        alignment:
-                                        Alignment.centerLeft,
-                                        child: PluginPanel(
-                                          plugins: widget.plugins,
-                                          overlayKey: _overlayKey,
-                                          layerLink: _layerLink,
+                      alignment: Alignment.topCenter,
+                      children: [
+                        Column(
+                          children: [
+                            Expanded(child: currentStory),
+                            RepaintBoundary(
+                              child: Material(
+                                child: SafeArea(
+                                  top: false,
+                                  child: CompositedTransformTarget(
+                                    link: _layerLink,
+                                    child: Directionality(
+                                      textDirection: TextDirection.ltr,
+                                      child: Container(
+                                        width: double.infinity,
+                                        decoration: const BoxDecoration(
+                                          border: Border(
+                                            top: BorderSide(
+                                              color: Colors.black12,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: PluginPanel(
+                                                plugins: widget.plugins,
+                                                overlayKey: _overlayKey,
+                                                layerLink: _layerLink,
+                                              ),
+                                            ),
+                                            widget.brandingWidget ??
+                                                const SizedBox.shrink(),
+                                          ],
                                         ),
                                       ),
-                                      widget.brandingWidget ??
-                                          const SizedBox.shrink(),
-                                    ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                  Directionality(
-                    textDirection: TextDirection.ltr,
-                    child: Overlay(key: _overlayKey),
-                  ),
-                ],
-              )
+                        Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: Overlay(key: _overlayKey),
+                        ),
+                      ],
+                    )
                   : currentStory,
             ),
           ),
         ),
       ),
     );
-
   }
-
 }
 
 class CurrentStory extends StatelessWidget {
@@ -244,7 +242,49 @@ class CurrentStory extends StatelessWidget {
       key: ValueKey(story.name),
       child: pluginBuilders.isEmpty
           ? child
-          : Nested(children: pluginBuilders, child: child),
+          : story.docBuilder != null
+              ? _Tabs(
+                  tabs: const [
+                    Tab(text: 'Story'),
+                    Tab(text: 'Documentation'),
+                  ],
+                  children: [
+                    Nested(children: pluginBuilders, child: child),
+                    story.docBuilder?.call(context) ?? const SizedBox.shrink(),
+                  ],
+                )
+              : Nested(children: pluginBuilders, child: child),
     );
   }
+}
+
+class _Tabs extends StatelessWidget {
+  const _Tabs({
+    Key? key,
+    required this.tabs,
+    required this.children,
+  }) : super(key: key);
+
+  final List<Widget> tabs;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) => Material(
+        child: DefaultTabController(
+          length: tabs.length,
+          child: Column(
+            children: [
+              TabBar(
+                tabs: tabs,
+                labelStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              Expanded(
+                child: TabBarView(
+                  children: children,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
 }

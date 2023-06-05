@@ -31,6 +31,9 @@ class MyApp extends StatelessWidget {
           Story(
             name: 'Screens/Scaffold',
             description: 'Story with scaffold and different knobs.',
+            docBuilder: (context) => const Text(
+              'This is a story with scaffold and different knobs.',
+            ),
             builder: (context) => Scaffold(
               appBar: AppBar(
                 title: Text(
