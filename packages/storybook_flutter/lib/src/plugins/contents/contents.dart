@@ -88,6 +88,7 @@ class _ContentsState extends State<_Contents> {
             title,
             style: const TextStyle(
               fontWeight: FontWeight.w600,
+              fontSize: 13,
             ),
           ),
           initiallyExpanded: context
@@ -115,7 +116,7 @@ class _ContentsState extends State<_Contents> {
       title: Text(
         story.title,
         style: const TextStyle(
-          fontSize: 13,
+            fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
       ),

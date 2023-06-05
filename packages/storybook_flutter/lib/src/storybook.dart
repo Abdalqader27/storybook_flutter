@@ -138,6 +138,7 @@ class _StorybookState extends State<Storybook> {
             view: View.of(context),
             child: Nested(
               children: [
+
                 Provider.value(value: widget.plugins),
                 ChangeNotifierProvider.value(value: _storyNotifier),
                 ...widget.plugins
@@ -145,61 +146,66 @@ class _StorybookState extends State<Storybook> {
                     .whereType<TransitionBuilder>()
                     .map((builder) => SingleChildBuilder(builder: builder))
               ],
-              child: widget.showPanel
-                  ? Stack(
-                      alignment: Alignment.topCenter,
-                      children: [
-                        Column(
-                          children: [
-                            Expanded(child: currentStory),
-                            RepaintBoundary(
-                              child: Material(
-                                child: SafeArea(
-                                  top: false,
-                                  child: CompositedTransformTarget(
-                                    link: _layerLink,
-                                    child: Directionality(
-                                      textDirection: TextDirection.ltr,
-                                      child: Container(
-                                        width: double.infinity,
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            top: BorderSide(
-                                              color: Colors.black12,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: PluginPanel(
-                                                plugins: widget.plugins,
-                                                overlayKey: _overlayKey,
-                                                layerLink: _layerLink,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: widget.brandingWidget ??
+                        const SizedBox.shrink(),
+                  ),
+                  Expanded(
+                    child: widget.showPanel
+                        ? Stack(
+                            alignment: Alignment.topCenter,
+                            children: [
+
+                              Column(
+                                children: [
+                                  Expanded(child: currentStory),
+                                  RepaintBoundary(
+                                    child: Material(
+                                      child: SafeArea(
+                                        top: false,
+                                        child: CompositedTransformTarget(
+                                          link: _layerLink,
+                                          child: Directionality(
+                                            textDirection: TextDirection.ltr,
+                                            child: Container(
+                                              width: double.infinity,
+                                              decoration: const BoxDecoration(
+                                                border: Border(
+                                                  top: BorderSide(
+                                                    color: Colors.black12,
+                                                  ),
+                                                ),
+                                              ),
+                                              child: Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: PluginPanel(
+                                                  plugins: widget.plugins,
+                                                  overlayKey: _overlayKey,
+                                                  layerLink: _layerLink,
+                                                ),
                                               ),
                                             ),
-                                            widget.brandingWidget ??
-                                                const SizedBox.shrink(),
-                                          ],
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
-                        Directionality(
-                          textDirection: TextDirection.ltr,
-                          child: Overlay(key: _overlayKey),
-                        ),
-                      ],
-                    )
-                  : currentStory,
+                              Directionality(
+                                textDirection: TextDirection.ltr,
+                                child: Overlay(key: _overlayKey),
+                              ),
+
+                            ],
+                          )
+                        : currentStory,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -277,6 +283,7 @@ class _Tabs extends StatelessWidget {
               TabBar(
                 tabs: tabs,
                 labelStyle: Theme.of(context).textTheme.labelLarge,
+                indicatorSize: TabBarIndicatorSize.label,
               ),
               Expanded(
                 child: TabBarView(
